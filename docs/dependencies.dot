@@ -1,0 +1,20 @@
+digraph Dependencies {
+    "config_files" -> "project_name";
+    "config_files" -> "var.depends_on_resource";
+    "config_files" -> "root_path";
+    "config_files" -> "depends_on_resource";
+    "root_dir" -> "root_path";
+    "root_dir" -> "root_name";
+    "service_dir" -> "var.depends_on_resource";
+    "service_dir" -> "service_path";
+    "service_dir" -> "service_name";
+    "service_dir" -> "txt";
+    "service_dir" -> "depends_on_resource";
+    "service_dir" -> "config_files";
+    "summary_creator" -> "service_path";
+    "summary_creator" -> "root_path";
+    "summary_creator" -> "service_name";
+    "summary_creator" -> "service_data_id";
+    "summary_creator" -> "service_file";
+    "summary_creator" -> "config_files";
+}

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Hook commit-msg: valida formato de mensaje de commit.
+# En caso el formato sea incorrecto, se rechazará y se mostrará el formato correcto.
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(head -n1 "$COMMIT_MSG_FILE")
+
+# Patrón correcto del mensaje commit
+PATTERN='^(feat|fix|docs|test|refactor|ci|chore)\([a-zA-Z0-9_-]+\): \(Issue #[0-9]+\) .{10,100}$'
+
+if ! [[ "$COMMIT_MSG" =~ $PATTERN ]]; then
+  echo "Error: Formato de commit inválido."
+  echo "Debe seguir: <tipo>(<scope>): (Issue #<número>) <mensaje de 10-100 caracteres>"
+  exit 1
+fi
+
+exit 0

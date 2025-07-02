@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Linting Python global usando flake8
+if command -v flake8 &>/dev/null; then
+  flake8 .
+  if [[ $? -ne 0 ]]; then
+    echo "[pre-push] Error: flake8 encontró problemas."
+    exit 1
+  fi
+fi
+
+# Formato de Terraform (verifica que todo el código esté formateado correctamente)
+TF_DIRS=$(find . -name "*.tf" | xargs -I{} dirname {} | sort -u | uniq)
+for dir in $TF_DIRS; do
+  if [ -d "$dir" ]; then
+    terraform -chdir="$dir" fmt -check
+    if [[ $? -ne 0 ]]; then
+      echo "[pre-push] Error: terraform fmt falló en $dir."
+      exit 1
+    fi
+  fi
+done
+
+# Verifica si hay tests antes de correr pytest+coverage
+if command -v pytest &>/dev/null; then
+  NUM_TESTS=$(pytest --collect-only | grep -c "Function test_")
+  if [[ $NUM_TESTS -eq 0 ]]; then
+    echo "[pre-push] Advertencia: No se encontraron tests, omitiendo validación de coverage."
+  else
+    pytest
+    PYTEST_EXIT_CODE=$?
+    if [[ $PYTEST_EXIT_CODE -eq 1 ]]; then
+      echo "[pre-push] Error: pytest falló en al menos un test."
+      exit 1
+    elif [[ $PYTEST_EXIT_CODE -ne 0 ]]; then
+      echo "[pre-push] Error: pytest terminó con código $PYTEST_EXIT_CODE."
+      exit 1
+    fi
+  fi
+fi
+
+echo "[pre-push] Todos los linters y pruebas pasaron."
+exit 0

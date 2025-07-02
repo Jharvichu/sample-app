@@ -1,0 +1,3 @@
+Este servicio depende de:
+modules/root_dir/infra_local/main.conf
+modules/root_dir/infra_local/app.conf

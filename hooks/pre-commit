@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Impide commits en ramas protegidas (main, develop, release)
+# Obteniendo rama actual
+branch=$(git symbolic-ref --short HEAD)
+
+# Ramas protegidas (no se permiten hacer commits)
+ramas_protegidas=("main" "develop" "release")
+
+# Verificar si la rama actual está en la lista de ramas protegidas
+for rama in "${ramas_protegidas[@]}"; do
+  if [[ "$branch" == "$rama" ]]; then
+    echo "ERROR: No está permitido hacer commit directamente en la rama '$branch'."
+    echo "Crea una rama de trabajo para tus commits."
+    exit 1
+  fi
+done
+
+# Linting ágil solo para archivos staged
+echo "[pre-commit] Linting ágil..."
+
+# Archivos staged
+FILES=$(git diff --cached --name-only)
+PY_FILES=$(echo "$FILES" | grep -E '\.py$' || true)
+TF_FILES=$(echo "$FILES" | grep -E '\.tf$' || true)
+
+# Flake8 solo errores críticos en Python
+if [[ -n "$PY_FILES" ]]; then
+  flake8 --select=E9,F63,F7,F82 --show-source $PY_FILES
+  if [[ $? -ne 0 ]]; then
+    echo "[pre-commit] Error: flake8 encontró errores críticos en archivos Python."
+    exit 1
+  fi
+fi
+
+# terraform fmt para archivos .tf staged
+if [[ -n "$TF_FILES" ]]; then
+  for file in $TF_FILES; do
+    terraform fmt -check "$file"
+    if [[ $? -ne 0 ]]; then
+      echo "[pre-commit] Error: El archivo $file no está formateado con terraform fmt."
+      echo "Ejecuta: terraform fmt $file"
+      exit 1
+    fi
+  done
+fi
+
+exit 0

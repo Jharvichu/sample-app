@@ -1,0 +1,1 @@
+#  `infra/main.tf` orquesta la integración de los módulos, pasando variables y conectando las salidas entre sí, garantizando que las dependencias estén explícitamente modeladas.

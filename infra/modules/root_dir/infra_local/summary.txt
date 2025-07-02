@@ -1,0 +1,5 @@
+Infraestructura generada:
+- Config principal: modules/root_dir/infra_local/main.conf
+- Config secundaria: modules/root_dir/infra_local/app.conf
+- Servicio en: modules/root_dir/infra_local/service
+- Archivo de servicio: modules/root_dir/infra_local/service/service_data.txt
