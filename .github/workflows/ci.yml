@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - develop
+  tags:
+    - 'v*'
 
 jobs:
   duplicity-jscpd:
@@ -78,3 +80,20 @@ jobs:
         run: |
           cd infra/modules
           tflint
+
+  generate-docs-on-tag:
+    name: "Generar documentación por tag"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar entorno Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencias Python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Generar documentación para el tag
+        run: |
+          python scripts/doc_extractor.py --output ${{ github.ref_name }}
